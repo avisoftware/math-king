@@ -5,7 +5,7 @@ import { useGame } from "../context/useGame";
 import { generateProblem } from "../utils/mathProblems";
 import styled from "styled-components";
 import { motion } from "framer-motion";
-import { StyledBox as BaseBox} from "./StyledBox";
+import { StyledBox as BaseBox } from "./StyledBox";
 
 const StyledBox = styled(BaseBox)`
   justify-content: center;
@@ -97,14 +97,18 @@ const GameScreen = ({ onGameOver }) => {
 
     if (correct) {
       if (!isMuted) {
-        new Audio("/sounds/correct.mp3").play().catch(() => {});
+        new Audio(import.meta.env.BASE_URL + "sounds/correct.mp3")
+          .play()
+          .catch(() => {});
       }
       incrementScore();
       setTimeLeft(15); // Reset timer for next question
       setTimeout(generateNewProblem, 1000);
     } else {
       if (!isMuted) {
-        new Audio("/sounds/incorrect.mp3").play().catch(() => {});
+        new Audio(import.meta.env.BASE_URL + "sounds/incorrect.mp3")
+          .play()
+          .catch(() => {});
       }
       setGameEnded(true);
       setShowingCorrectAnswer(true);
