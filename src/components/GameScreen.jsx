@@ -48,8 +48,6 @@ const GameScreen = ({ onGameOver }) => {
   }, [score]);
 
   const generateNewProblem = () => {
-    console.log("Generating new problem...");
-
     const difficulty = getDifficulty();
     // Filter enabled operations
     const availableOperations = Object.entries(selectedOperations)
@@ -88,8 +86,6 @@ const GameScreen = ({ onGameOver }) => {
   }, [score, onGameOver, gameEnded]);
 
   const handleAnswer = (answer) => {
-    console.log("Answer clicked:", answer);
-
     if (gameEnded) return;
 
     const correct = answer === currentProblem.correctAnswer;
