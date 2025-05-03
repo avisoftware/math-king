@@ -1,6 +1,6 @@
 # Math King 👑
 
-[Live on GitHub Pages](https://YOUR_GITHUB_USERNAME.github.io/math-king/) <!-- Replace with your actual username -->
+[Live on GitHub Pages](https://avisoftware.github.io/math-king/) <!-- Replace with your actual username -->
 
 A fun and challenging math game built with React and Vite!
 
