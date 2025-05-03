@@ -1,199 +1,188 @@
-import {
-  Box,
-  Button,
-  Typography,
-  IconButton,
-  Select,
-  MenuItem,
-  FormControl,
-} from "@mui/material";
+import { Box, Button, Typography } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import { useGame } from "../context/useGame";
-import { VolumeUp, VolumeOff } from "@mui/icons-material";
 import styled from "styled-components";
 import { motion } from "framer-motion";
 import { StyledBox } from "./StyledBox";
 
-const TopBar = styled(Box)`
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  display: flex;
-  justify-content: center;
-  padding: 1rem;
+const OperationsContainer = styled(motion.div)`
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
   gap: 1rem;
-  z-index: 10;
-  direction: ltr !important; /* Force LTR direction */
+  width: 100%;
+  max-width: 400px;
+  margin: 1rem 0 2rem 0;
 `;
 
-const ContentContainer = styled(Box)`
+const OperationButton = styled(motion.button)`
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: none;
+  border-radius: 1rem;
+  padding: 2rem 1rem;
+  color: white;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  flex: 1;
-  width: 100%;
-  max-width: 800px;
-  margin-top: 80px;
-`;
+  gap: 0.5rem;
 
-const OperationsContainer = styled(Box)`
-  display: flex;
-  gap: 1rem;
-  margin: 2rem 0;
-  flex-wrap: wrap;
-  justify-content: center;
-`;
+  .operation-symbol {
+    font-size: 2.5rem;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+  }
 
-const OperationButton = styled(motion.button)`
-  width: 100px;
-  height: 100px;
-  border-radius: 50%;
-  border: none;
-  font-size: 2.5rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  background-color: white;
-  color: #333;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  transition: transform 0.2s, box-shadow 0.2s;
+  .operation-name {
+    font-size: 1.2rem;
+    opacity: 0.9;
+  }
 
   &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    transform: translateY(-4px);
+    background: rgba(255, 255, 255, 0.2);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
   }
 
   &:active {
-    transform: translateY(0);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
   }
 `;
 
-const StyledSelect = styled(Select)`
-  color: white;
-  & .MuiOutlinedInput-notchedOutline {
-    border-color: white;
-  }
-  &:hover .MuiOutlinedInput-notchedOutline {
-    border-color: white;
-  }
-  &.Mui-focused .MuiOutlinedInput-notchedOutline {
-    border-color: white;
-  }
-  & .MuiSelect-icon {
-    color: white;
-  }
+const ButtonContainer = styled(Box)`
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: 100%;
+  max-width: 400px;
 `;
 
-const StartScreen = ({ onStart, onLeaderboard }) => {
+const StartScreen = ({ onStart, onLeaderboard, onSettings }) => {
   const { t, i18n } = useTranslation();
-  const { isMuted, toggleMute, setSelectedOperations } = useGame();
+  const { setCurrentOperation } = useGame();
 
-  const handleLanguageChange = (event) => {
-    const lang = event.target.value;
-    i18n.changeLanguage(lang);
-    localStorage.setItem("language", lang);
-    document.dir = lang === "he" ? "rtl" : "ltr";
-  };
-
-  const languages = [
-    { code: "en", label: "English" },
-    { code: "fr", label: "Français" },
-    { code: "es", label: "Español" },
-    { code: "he", label: "עברית" },
+  const operations = [
+    { key: "addition", symbol: "+" },
+    { key: "subtraction", symbol: "−" },
+    { key: "multiplication", symbol: "×" },
+    { key: "division", symbol: "÷" },
   ];
 
-  const startWithOperation = (operation) => {
-    setSelectedOperations({
-      addition: operation === "addition",
-      subtraction: operation === "subtraction",
-      multiplication: operation === "multiplication",
-      division: operation === "division",
-    });
+  const handleOperationClick = (operation) => {
+    setCurrentOperation(operation);
     onStart();
   };
 
-  const operationButtons = [
-    { type: "addition", symbol: "+", color: "#4CAF50" },
-    { type: "subtraction", symbol: "−", color: "#FF9800" },
-    { type: "multiplication", symbol: "×", color: "#2196F3" },
-    { type: "division", symbol: "÷", color: "#9C27B0" },
-  ];
-
   return (
     <StyledBox dir={i18n.language === "he" ? "rtl" : "ltr"}>
-      <TopBar>
-        <FormControl size="small" sx={{ minWidth: 120 }}>
-          <StyledSelect
-            value={i18n.language}
-            onChange={handleLanguageChange}
-            variant="outlined"
-            sx={{ color: "white" }}
-          >
-            {languages.map(({ code, label }) => (
-              <MenuItem key={code} value={code}>
-                {label}
-              </MenuItem>
-            ))}
-          </StyledSelect>
-        </FormControl>
-        <IconButton onClick={toggleMute} sx={{ color: "white" }}>
-          {isMuted ? <VolumeOff /> : <VolumeUp />}
-        </IconButton>
-      </TopBar>
-
-      <ContentContainer>
+      <Box
+        component={motion.div}
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          gap: 2,
+          width: "100%",
+          padding: 3,
+        }}
+      >
         <motion.div
           initial={{ scale: 0.5, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          transition={{ duration: 0.5 }}
+          transition={{ type: "spring", duration: 0.6 }}
         >
           <Typography
             variant="h1"
-            component="h1"
-            color="white"
-            align="center"
-            sx={{ mb: 4, fontWeight: "bold" }}
+            sx={{
+              fontSize: { xs: "3rem", sm: "4rem" },
+              fontWeight: 700,
+              color: "white",
+              textAlign: "center",
+              textShadow: "0 2px 10px rgba(0,0,0,0.2)",
+              marginBottom: 2,
+            }}
           >
             {t("mathKing")}
           </Typography>
         </motion.div>
 
-        <OperationsContainer>
-          {operationButtons.map(({ type, symbol, color }) => (
+        <OperationsContainer
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.3 }}
+        >
+          {operations.map((op, index) => (
             <OperationButton
-              key={type}
+              key={op.key}
+              onClick={() => handleOperationClick(op.key)}
               as={motion.button}
-              onClick={() => startWithOperation(type)}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              style={{ backgroundColor: color, color: "white" }}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 * index }}
+              style={{
+                background:
+                  op.key === "addition"
+                    ? "linear-gradient(135deg, #4CAF50, #388E3C)" // Green for addition
+                    : op.key === "subtraction"
+                    ? "linear-gradient(135deg, #FF5722, #E64A19)" // Orange/Red for subtraction
+                    : op.key === "multiplication"
+                    ? "linear-gradient(135deg, #9C27B0, #7B1FA2)" // Purple for multiplication
+                    : "linear-gradient(135deg, #FFC107, #FFA000)", // Yellow/Gold for division
+              }}
             >
-              {symbol}
+              <span className="operation-symbol">{op.symbol}</span>
             </OperationButton>
           ))}
         </OperationsContainer>
 
-        <Button
-          variant="outlined"
-          color="inherit"
-          size="large"
-          onClick={onLeaderboard}
-          sx={{
-            color: "white",
-            borderColor: "white",
-            width: "200px",
-            height: "50px",
-            fontSize: "1.1rem",
-            marginTop: "2rem",
-          }}
-        >
-          {t("viewLeaderboard")}
-        </Button>
-      </ContentContainer>
+        <ButtonContainer>
+          <Button
+            variant="contained"
+            onClick={onLeaderboard}
+            sx={{
+              fontSize: "1.1rem",
+              padding: "0.8rem",
+              borderRadius: "0.8rem",
+              background: "linear-gradient(135deg, #64B5F6, #42A5F5)",
+              textTransform: "none",
+              boxShadow: "0 4px 15px rgba(0,0,0,0.1)",
+              "&:hover": {
+                background: "linear-gradient(135deg, #42A5F5, #2196F3)",
+                transform: "translateY(-2px)",
+                boxShadow: "0 6px 20px rgba(0,0,0,0.15)",
+              },
+              transition: "all 0.2s ease-in-out",
+            }}
+          >
+            {t("viewLeaderboard")}
+          </Button>
+
+          <Button
+            variant="contained"
+            onClick={onSettings}
+            sx={{
+              fontSize: "1.1rem",
+              padding: "0.8rem",
+              borderRadius: "0.8rem",
+              background: "linear-gradient(135deg, #9575CD, #7E57C2)",
+              textTransform: "none",
+              boxShadow: "0 4px 15px rgba(0,0,0,0.1)",
+              "&:hover": {
+                background: "linear-gradient(135deg, #7E57C2, #673AB7)",
+                transform: "translateY(-2px)",
+                boxShadow: "0 6px 20px rgba(0,0,0,0.15)",
+              },
+              transition: "all 0.2s ease-in-out",
+            }}
+          >
+            {t("settings")}
+          </Button>
+        </ButtonContainer>
+      </Box>
     </StyledBox>
   );
 };

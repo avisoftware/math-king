@@ -1,70 +1,55 @@
-import { useState, useCallback } from 'react'
-import { GameContext } from './context'
+import { useState, useCallback } from "react";
+import { GameContext } from "./context";
 
 export function GameProvider({ children }) {
-  const [score, setScore] = useState(0)
-  const [isMuted, setIsMuted] = useState(false)
-  const [language, setLanguage] = useState('en')
-  const [selectedOperations, setSelectedOperations] = useState({
-    addition: true,
-    subtraction: false,
-    multiplication: false,
-    division: false
-  })
-
-  const incrementScore = useCallback(() => {
-    setScore(prev => prev + 1)
-  }, [])
-
-  const resetScore = useCallback(() => {
-    setScore(0)
-  }, [])
+  const [isMuted, setIsMuted] = useState(false);
+  const [language, setLanguage] = useState("en");
+  const [timePerQuestion, setTimePerQuestion] = useState(15);
+  const [currentOperation, setCurrentOperation] = useState(null);
 
   const toggleMute = useCallback(() => {
-    setIsMuted(prev => !prev)
-  }, [])
-
-  const toggleOperation = useCallback((operation) => {
-    setSelectedOperations(prev => ({
-      ...prev,
-      [operation]: !prev[operation]
-    }))
-  }, [])
+    setIsMuted((prev) => !prev);
+  }, []);
 
   const changeLanguage = useCallback((lang) => {
-    setLanguage(lang)
-  }, [])
+    setLanguage(lang);
+  }, []);
 
   const getLeaderboard = useCallback(() => {
-    const leaderboard = localStorage.getItem('mathKingLeaderboard')
-    return leaderboard ? JSON.parse(leaderboard) : []
-  }, [])
+    const leaderboard = localStorage.getItem("mathKingLeaderboard");
+    return leaderboard ? JSON.parse(leaderboard) : [];
+  }, []);
 
-  const saveScore = useCallback((name) => {
-    const leaderboard = getLeaderboard()
-    const newEntry = { name, score, date: new Date().toISOString() }
-    const newLeaderboard = [...leaderboard, newEntry]
-      .sort((a, b) => b.score - a.score)
-      .slice(0, 10)
+  const saveScore = useCallback(
+    (name, score) => {
+      const leaderboard = getLeaderboard();
+      const newEntry = { name, score, date: new Date().toISOString() };
+      const newLeaderboard = [...leaderboard, newEntry]
+        .sort((a, b) => b.score - a.score)
+        .slice(0, 10);
 
-    localStorage.setItem('mathKingLeaderboard', JSON.stringify(newLeaderboard))
-    return newLeaderboard
-  }, [score, getLeaderboard])
+      localStorage.setItem(
+        "mathKingLeaderboard",
+        JSON.stringify(newLeaderboard)
+      );
+      return newLeaderboard;
+    },
+    [ getLeaderboard]
+  );
 
   const value = {
-    score,
     isMuted,
+    setIsMuted,
     language,
-    selectedOperations,
-    incrementScore,
-    resetScore,
+    timePerQuestion,
+    currentOperation,
     toggleMute,
-    toggleOperation,
     changeLanguage,
     getLeaderboard,
     saveScore,
-    setSelectedOperations
-  }
+    setTimePerQuestion,
+    setCurrentOperation,
+  };
 
-  return <GameContext.Provider value={value}>{children}</GameContext.Provider>
+  return <GameContext.Provider value={value}>{children}</GameContext.Provider>;
 }

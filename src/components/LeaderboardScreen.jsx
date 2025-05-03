@@ -1,89 +1,155 @@
-import { Box, Button, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material'
-import { useTranslation } from 'react-i18next'
-import { useGame } from '../context/useGame'
-import styled from 'styled-components'
-import { motion } from 'framer-motion'
-import { StyledBox } from './StyledBox'
+import { Box, Button, Typography } from "@mui/material";
+import { useTranslation } from "react-i18next";
+import { useGame } from "../context/useGame";
+import { StyledBox } from "./StyledBox";
+import { motion } from "framer-motion";
+import styled from "styled-components";
 
-const ContentBox = styled(motion.div)`
-  background: white;
-  padding: 2rem;
+const LeaderboardContainer = styled(motion.div)`
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
   border-radius: 1rem;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem;
   width: 100%;
-  max-width: 600px;
-`
+  max-width: 500px;
+  overflow: hidden;
+`;
+
+const ScoreEntry = styled(motion.div)`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  margin: 0.5rem 0;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 0.8rem;
+  transition: transform 0.2s;
+
+  &:hover {
+    transform: translateX(5px);
+    background: rgba(255, 255, 255, 0.1);
+  }
+`;
 
 const LeaderboardScreen = ({ onBack }) => {
-  const { t } = useTranslation()
-  const { getLeaderboard } = useGame()
-  const leaderboard = getLeaderboard()
-
-  const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString()
-  }
+  const { t } = useTranslation();
+  const { getLeaderboard } = useGame();
+  const leaderboard = getLeaderboard();
 
   return (
     <StyledBox>
-      <ContentBox
-        initial={{ y: 20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.5 }}
+      <Box
+        component={motion.div}
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          gap: 3,
+          width: "100%",
+          padding: 3,
+          alignItems: "center",
+        }}
       >
-        <Typography variant="h3" component="h2" gutterBottom align="center">
-          {t('leaderboard')}
-        </Typography>
+        <motion.div
+          initial={{ scale: 0.9, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+        >
+          <Typography
+            variant="h3"
+            sx={{
+              color: "white",
+              textAlign: "center",
+              marginBottom: 4,
+              fontWeight: 600,
+              textShadow: "0 2px 10px rgba(0,0,0,0.2)",
+            }}
+          >
+            {t("leaderboard")}
+          </Typography>
+        </motion.div>
 
-        <TableContainer component={Paper} elevation={0}>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>{t('rank')}</TableCell>
-                <TableCell>{t('name')}</TableCell>
-                <TableCell align="right">{t('score')}</TableCell>
-                <TableCell align="right">{t('date')}</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {leaderboard.map((entry, index) => (
-                <TableRow
-                  key={index}
+        <LeaderboardContainer
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+        >
+          {leaderboard.length > 0 ? (
+            leaderboard.map((entry, index) => (
+              <ScoreEntry
+                key={index}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.1 * index }}
+              >
+                <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+                  <Typography
+                    variant="h6"
+                    sx={{
+                      color: "white",
+                      opacity: 0.8,
+                      fontWeight: 600,
+                      minWidth: "2rem",
+                    }}
+                  >
+                    #{index + 1}
+                  </Typography>
+                  <Typography
+                    variant="h6"
+                    sx={{ color: "white", fontWeight: 500 }}
+                  >
+                    {entry.name}
+                  </Typography>
+                </Box>
+                <Typography
+                  variant="h6"
                   sx={{
-                    backgroundColor: index < 3 ? 'rgba(255, 215, 0, 0.1)' : 'inherit'
+                    color: "white",
+                    fontWeight: 600,
                   }}
                 >
-                  <TableCell component="th" scope="row">
-                    {index + 1}
-                  </TableCell>
-                  <TableCell>{entry.name}</TableCell>
-                  <TableCell align="right">{entry.score}</TableCell>
-                  <TableCell align="right">{formatDate(entry.date)}</TableCell>
-                </TableRow>
-              ))}
-              {leaderboard.length === 0 && (
-                <TableRow>
-                  <TableCell colSpan={4} align="center">
-                    No scores yet!
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </TableContainer>
+                  {entry.score}
+                </Typography>
+              </ScoreEntry>
+            ))
+          ) : (
+            <Typography
+              variant="h6"
+              sx={{
+                color: "white",
+                textAlign: "center",
+                opacity: 0.7,
+              }}
+            >
+              {t("noScores")}
+            </Typography>
+          )}
+        </LeaderboardContainer>
 
-        <Box sx={{ mt: 3, display: 'flex', justifyContent: 'center' }}>
-          <Button
-            variant="contained"
-            color="secondary"
-            size="large"
-            onClick={onBack}
-          >
-            {t('back')}
-          </Button>
-        </Box>
-      </ContentBox>
+        <Button
+          variant="contained"
+          onClick={onBack}
+          sx={{
+            marginTop: 2,
+            fontSize: "1.1rem",
+            padding: "0.8rem 2rem",
+            borderRadius: "0.8rem",
+            background: "linear-gradient(135deg, #64B5F6, #42A5F5)",
+            textTransform: "none",
+            boxShadow: "0 4px 15px rgba(0,0,0,0.1)",
+            "&:hover": {
+              background: "linear-gradient(135deg, #42A5F5, #2196F3)",
+              transform: "translateY(-2px)",
+              boxShadow: "0 6px 20px rgba(0,0,0,0.15)",
+            },
+            transition: "all 0.2s ease-in-out",
+          }}
+        >
+          {t("back")}
+        </Button>
+      </Box>
     </StyledBox>
-  )
-}
+  );
+};
 
-export default LeaderboardScreen
+export default LeaderboardScreen;
